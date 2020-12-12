@@ -1,47 +1,66 @@
-import React from 'react';
-import './App.css';
-import Todos from './Todos'
-import AddTodo from './AddTodo'
+import React, { useEffect, useState } from "react";
 
-class App extends React.Component {
+const App = () => {
+  const [lis, setLis] = useState([]);
+  const [inputText, setInputText] = useState("");
 
-  state = {
-    todos: [
-      { id: 1, content: 'buy some drink' },
-      { id: 2, content: 'Play mario kart' }
-    ]
+  function handleChange(event) {
+    const newValue = event.target.value;
+    setInputText(newValue);
   }
+  const onAdd = (s) => {
+    if (s.trim() !== "") {
+      const n = { active: true, text: s };
+      setLis([...lis, n]);
+      setInputText("");
+    }
+  };
+  const handleDelete = (index) => {
+    const toDoList = lis;
+    toDoList[index].active = false;
 
-  addTodo = (newTodo) => {
-
-    newTodo.id = Math.random()
-    let newtodo = [...this.state.todos, newTodo]
-
-    this.setState({
-      todos : newtodo
-    })
-  }
-
-  deleteTodo = (id) => {
-    let updatedTodoList = this.state.todos.filter((todo) => { return todo.id !== id })
-    this.setState({
-      todos: updatedTodoList
-    })
-  }
-
-  render() {
-    return (
-
-      <div className="todo-app container">
-        <h1 className="center blue-text">todos</h1>
-        <Todos todos={this.state.todos} deleteTodo={this.deleteTodo} addTodo={this.addTodo} />
-        <AddTodo addTodo={this.addTodo} />
-      </div>
-
-
-
-    )
-  }
-}
+    setLis(
+      lis.map((el) => (el.id === index ? { ...el, ["active"]: false } : el))
+    );
+  };
+  const countTask = () => {
+    var ans = 0;
+    for (i in lis) {
+      if (lis[i].active) ans++;
+    }
+    return ans;
+  };
+  return (
+    <div>
+      <input onChange={handleChange} type="text" value={inputText} />
+      <button
+        onClick={() => {
+          onAdd(inputText);
+        }}
+      >
+        Add
+      </button>
+      <br />
+      {countTask()} remainging out of {lis.length} tasks.
+      <ul>
+        {lis?.map((item, index) => {
+          return (
+            <li
+              key={index}
+              style={{
+                textDecoration: item && !item.active ? "line-through" : "none"
+              }}
+              onClick={() => {
+                handleDelete(index);
+              }}
+            >
+              {item.text}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+};
 
 export default App;
